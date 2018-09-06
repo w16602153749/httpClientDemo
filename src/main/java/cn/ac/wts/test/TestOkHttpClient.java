@@ -1,4 +1,4 @@
-package cn.ac.wts;
+package cn.ac.wts.test;
 
 import java.io.IOException;
 import java.util.HashMap;
