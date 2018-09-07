@@ -28,23 +28,25 @@ public class TestOkHttpClient {
 	
 	public static void main(String[] args) throws Exception{
 		Map<String, String> params = new HashMap<String, String>();
-		//params.put("Username", "admin");
-		//params.put("Password", "admin123");
-		//postByOkHttpClient("http://192.168.99.100:9000/api/auth", JSON.toJSONString(params), "");
-		//getByOkHttpClient("http://192.168.99.100:9000/api/endpoints/1/docker/containers/json", bear);
+		params.put("Username", "admin");
+		params.put("Password", "admin123");
+		postByOkHttpClient("http://192.168.99.100:9000/api/auth", JSON.toJSONString(params), "");
+//		getByOkHttpClient("http://192.168.99.100:9000/api/endpoints/1/docker/containers/json", bear);
 		
 		//String jsonParm=FileUtils.readFileToString(new File(TestOkHttpClient.class.getClass().getResource("/testCreate.json").getPath()));
 		//System.out.println("jsonParm: "+jsonParm); 
 		//postByOkHttpClient("http://192.168.99.100:9000/api/endpoints/1/docker/containers/create?name=tomcatTest", 
 		//		jsonParm, bear);
 		
-		params.put("login", "root");
-		params.put("password", "12345678");
+//		params.put("login", "root");
+//		params.put("password", "12345678");
 		
 //		postByOkHttpClient("http://192.168.99.100/api/v3"+"/session", 
 //					JSON.toJSONString(params)); 
-		postFormByOkHttpClient("http://192.168.99.100/api/v3"+"/session", 
-						params); 
+		
+//		postFormByOkHttpClient("http://192.168.99.100/api/v3"+"/session", 
+//						params); 
+		
 	}
 	
 	 
@@ -70,7 +72,7 @@ public class TestOkHttpClient {
 			System.out.println("fail code: " + response.code());
 			System.out.println("fail body: " + response.body().string());
 			throw new IOException("Unexpected code " + response);
-		}
+		} 
 	}
 
 	public static void getByOkHttpClient(String url, String bear) throws Exception {
