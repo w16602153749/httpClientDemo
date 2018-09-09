@@ -1,10 +1,14 @@
 package cn.ac.wts.util;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.alibaba.fastjson.JSON;
+
+import cn.wts.entity.User;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -33,6 +37,18 @@ public class OkHttpUtil {
     	}
     }
     
+    public static void printResponseInfo(Response response)throws Exception{
+    	if (response.isSuccessful()) { 
+    		int code= response.code();
+			String body=response.body().string();
+			System.out.println("success code: " + code);
+			System.out.println("success body: " + body);
+    	}else{
+    		System.out.println("fail code: " + response.code());
+			System.out.println("fail body: " + response.body().string());
+			throw new IOException("Unexpected code " + response);
+    	}
+    }
     
     public static Response getByOkHttpClient(String url,Map<String,String> paramMap) throws IOException{
     	if(paramMap!=null &&paramMap.size()>0){
@@ -46,12 +62,28 @@ public class OkHttpUtil {
     	return execute(request); 
     }
     
+    /**
+     * okhttp Post方式提交json数据
+     * @param url
+     * @param paramJson
+     * @return
+     * @throws IOException
+     */
+    
     public static Response postJsonByOkHttpClient(String url,String paramJson) throws IOException{
     	RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, paramJson);
     	Request request = new Request.Builder().url(url)
     			.post(body).build();
     	return execute(request); 
     }
+    
+    /**
+     * okhttp Post方式提交表单
+     * @param url
+     * @param paramMap
+     * @return
+     * @throws IOException
+     */
     
     public static Response postFormByOkHttpClient(String url,Map<String,String> paramMap) throws IOException{
     	/**
@@ -99,4 +131,21 @@ public class OkHttpUtil {
             
         });
     }
+    
+    public static void main(String[] args) {
+		try {
+			Map<String,String>paramMap =new HashMap<String,String>();
+			paramMap.put("userName", "wts");
+			paramMap.put("passWord", "wtspwd");
+			User user=new User();
+			user.setUserName("wts");
+			user.setPassWord("123456");
+			//Response response=getByOkHttpClient("http://localhost:8080/springDemo/strInterFace", paramMap);
+			Response response2=postJsonByOkHttpClient("http://localhost:8080/springDemo/jsonInterFace", JSON.toJSONString(user));
+			printResponseInfo(response2);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
