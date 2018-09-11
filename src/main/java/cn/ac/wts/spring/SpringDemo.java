@@ -23,19 +23,27 @@ public class SpringDemo {
 	@RequestMapping(value = "strInterFace", method = RequestMethod.GET)
 	public String strInterFace(String str){
 		System.out.println("str: "+str);
-		return str;
+		return "str接口success";
 	} 
 	
 	@ResponseBody
-	@RequestMapping(value = "jsonInterFace", method = RequestMethod.GET)
+	@RequestMapping(value = "jsonInterFace")
 	public String jsonInterFace(@RequestBody User user){
 		System.out.println("userName: "+user.getUserName());
 		System.out.println("passWord: "+user.getPassWord()); 
-		return "success";
+		return "json接口success";
 	} 
 	
 	@ResponseBody
-	@RequestMapping(value = "fileInterface")
+	@RequestMapping(value = "formInterFace")
+	public String formInterFace(User user){
+		System.out.println("userName: "+user.getUserName());
+		System.out.println("passWord: "+user.getPassWord()); 
+		return "form接口success";
+	} 
+	
+	@ResponseBody
+	@RequestMapping(value = "fileInterface", method = RequestMethod.POST)
 	public String charactersearch(
 			@RequestParam(value = "springFile", required = true) MultipartFile file,String hash, String timestamp) {
 		System.out.println("file: "+file.getSize()); 

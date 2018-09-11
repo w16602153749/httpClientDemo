@@ -1,6 +1,9 @@
 package cn.ac.wts.util;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +20,12 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.internal.Util;
 import okhttp3.FormBody.Builder;
+import okhttp3.Headers;
  
 public class OkHttpUtil {
+	public static final MediaType FORM_CONTENT_TYPE= MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
 	//json数据
 	private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
 	//png数据
@@ -78,7 +84,7 @@ public class OkHttpUtil {
     }
     
     /**
-     * okhttp Post方式提交表单
+     * okhttp Post方式提交表单(有BUG,一直乱码)
      * @param url
      * @param paramMap
      * @return
@@ -90,11 +96,30 @@ public class OkHttpUtil {
     	 * okhttp3.FormBody instead of FormEncodingBuilder.
     	 * （OkHttp3.x中原来2.x里的FormEncodingBuilder已被FormBody取代）
     	 */
-    	Builder builder=new FormBody.Builder();
+    	Charset charset = Charset.forName(StandardCharsets.UTF_8.name());
+    	//这个垃圾FormBody不知道为啥一直乱码
+    	Builder builder=new FormBody.Builder(charset);
 		for(String paramKey:paramMap.keySet()){
-			builder.add(paramKey, paramMap.get(paramKey));
-		}
+			builder.add(paramKey, paramMap.get(paramKey)); 
+		} 
 		RequestBody body = builder.build();
+		Request request = new Request.Builder().url(url).post(body).build();
+		return execute(request); 
+    }
+    
+    /**
+     * okhttp Post方式提交表单(通过FORM_CONTENT_TYPE防止中文乱码)
+     * @param url
+     * @param paramMap
+     * @return
+     * @throws IOException
+     */
+    public static Response postFormContTypeByOkHttpClient(String url,Map<String,String> paramMap) throws IOException{
+    	  StringBuffer sb = new StringBuffer();
+    	  for (String key: paramMap.keySet()) {
+              sb.append(key+"="+paramMap.get(key)+"&");
+          }
+    	RequestBody body = RequestBody.create(FORM_CONTENT_TYPE, sb.toString());
 		Request request = new Request.Builder().url(url).post(body).build();
 		return execute(request); 
     }
@@ -135,14 +160,17 @@ public class OkHttpUtil {
     public static void main(String[] args) {
 		try {
 			Map<String,String>paramMap =new HashMap<String,String>();
-			paramMap.put("userName", "wts");
-			paramMap.put("passWord", "wtspwd");
+			paramMap.put("userName", "wts111");
+			paramMap.put("passWord", "wts111密码");
 			User user=new User();
 			user.setUserName("wts");
-			user.setPassWord("123456");
+			user.setPassWord("wts密码123456");
 			//Response response=getByOkHttpClient("http://localhost:8080/springDemo/strInterFace", paramMap);
-			Response response2=postJsonByOkHttpClient("http://localhost:8080/springDemo/jsonInterFace", JSON.toJSONString(user));
-			printResponseInfo(response2);
+			//Response response2=postJsonByOkHttpClient("http://localhost:8080/springDemo/jsonInterFace", JSON.toJSONString(user));
+			//Response formResponse1=getByOkHttpClient("http://localhost:8080/springDemo/formInterFace", paramMap);
+			//Response formResponse2=postFormByOkHttpClient("http://localhost:8080/springDemo/formInterFace", paramMap);
+			Response formResponse2=postFormContTypeByOkHttpClient("http://localhost:8080/springDemo/formInterFace", paramMap);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

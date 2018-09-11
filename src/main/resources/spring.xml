@@ -14,7 +14,10 @@
   <context:component-scan base-package="cn.ac.wts" />
   <!--     解决返回SpringMvc后台向前台页面返回String类型时乱码 -->
   <mvc:annotation-driven>
-		    <mvc:message-converters register-defaults="true">  
+  			 <!--设置不使用默认的消息转换器
+  			 如果不设置register-default='false'Spring 会默认帮我们注册貌似7个messageConvert 
+  			 -->
+		    <mvc:message-converters register-defaults="false">  
 		        <bean class="org.springframework.http.converter.StringHttpMessageConverter">  
 		             <property name="supportedMediaTypes">    
 		                <list>    
@@ -29,10 +32,14 @@
 
        		    <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
 
+ 				<bean class="org.springframework.http.converter.ResourceHttpMessageConverter" />
+ 
         		<bean class="org.springframework.http.converter.BufferedImageHttpMessageConverter" />
 
-		        <!--配置fastjson中实现HttpMessageConverter接口的转换器-->
-		        <bean id="fastJsonHttpMessageConverter" class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter4" >
+		        <!--配置fastjson中实现HttpMessageConverter接口的转换器
+		        	默认转换器是Jackson
+		        -->
+		        <bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter4" >
 		            <!--加入支持的媒体类型，返回contentType-->
 		            <property name="supportedMediaTypes">
 		                <list>
