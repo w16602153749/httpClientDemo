@@ -16,7 +16,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.FormBody.Builder;
 
-public class TestOkHttpClient {
+public class TestOkHttpClientViaPortainer {
 	//private static final OkHttpClient client = new OkHttpClient();
 	private static final OkHttpClient client = new OkHttpClient()
 												.newBuilder()

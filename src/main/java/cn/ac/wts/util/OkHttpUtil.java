@@ -1,5 +1,6 @@
 package cn.ac.wts.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -16,6 +17,8 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.MultipartBody.Part;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -31,8 +34,10 @@ public class OkHttpUtil {
 	//png数据
 	private static final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
 	//markdown数据
-	public static final MediaType MEDIA_TYPE_MARKDOWN= MediaType.parse("text/x-markdown; charset=utf-8");
-    private static  OkHttpClient mOkHttpClient = null;
+	private static final MediaType MEDIA_TYPE_MARKDOWN= MediaType.parse("text/x-markdown; charset=utf-8");
+	//二进制数据
+	private static final MediaType MEDIA_TYPE_FILE = MediaType.parse("application/octet-stream");
+	private static  OkHttpClient mOkHttpClient = null;
     static{
     	if(mOkHttpClient==null){
     		mOkHttpClient = new OkHttpClient()
@@ -49,6 +54,19 @@ public class OkHttpUtil {
 			String body=response.body().string();
 			System.out.println("success code: " + code);
 			System.out.println("success body: " + body);
+			
+			//提取响应头
+			Headers responseHeaders = response.headers();
+			// 这个循环遍历的方法很有意思，用的name,value
+			for (int i = 0; i < responseHeaders.size(); i++) {
+				System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
+			}
+			//使用header(name)会返回一个string
+			System.out.println("Server: " + response.header("Server"));
+		    System.out.println("Date: " + response.header("Date"));
+		    //使用headers(name)会返回一个string list
+		    System.out.println("Vary: " + response.headers("Vary"));
+		    
     	}else{
     		System.out.println("fail code: " + response.code());
 			System.out.println("fail body: " + response.body().string());
@@ -123,6 +141,44 @@ public class OkHttpUtil {
 		Request request = new Request.Builder().url(url).post(body).build();
 		return execute(request); 
     }
+    
+    /**
+     * okhttp post方式提交markdown文件
+     * @param url
+     * @return
+     */
+    public static Response postMarkDownFile(String url,String mdFilePath) throws IOException{
+    	File file =new File(mdFilePath);
+    	if(file==null ||!file.exists()|| !file.getName().endsWith(".md")){
+    		System.out.println("file not exist or file format is not correct");
+    		return null;
+    	} 
+    	Request request = new Request.Builder()
+    	        .url(url)
+    	        .post(RequestBody.create(MEDIA_TYPE_MARKDOWN, file))
+    	        .build();
+    	return execute(request); 
+    }
+    
+    public static Response postFile(String url,String filePath) throws IOException{
+    	File file =new File(filePath);
+    	if(file==null ||!file.exists()){
+    		System.out.println("file not exist or file format is not correct");
+    		return null;
+    	} 
+    	RequestBody fileBody = RequestBody.create(MEDIA_TYPE_FILE, file);
+		RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("springFile", file.getName(), fileBody)
+                .addFormDataPart("hash", "hash111")
+                .addFormDataPart("timestamp", "timestamp111")
+                .build();
+        Request request = new Request.Builder()
+    	        .url(url)
+    	        .post(requestBody)
+    	        .build();
+        return execute(request); 
+    }
     /**
      * 同步线程访问
      * @param request
@@ -157,23 +213,4 @@ public class OkHttpUtil {
         });
     }
     
-    public static void main(String[] args) {
-		try {
-			Map<String,String>paramMap =new HashMap<String,String>();
-			paramMap.put("userName", "wts111");
-			paramMap.put("passWord", "wts111密码");
-			User user=new User();
-			user.setUserName("wts");
-			user.setPassWord("wts密码123456");
-			//Response response=getByOkHttpClient("http://localhost:8080/springDemo/strInterFace", paramMap);
-			//Response response2=postJsonByOkHttpClient("http://localhost:8080/springDemo/jsonInterFace", JSON.toJSONString(user));
-			//Response formResponse1=getByOkHttpClient("http://localhost:8080/springDemo/formInterFace", paramMap);
-			//Response formResponse2=postFormByOkHttpClient("http://localhost:8080/springDemo/formInterFace", paramMap);
-			Response formResponse2=postFormContTypeByOkHttpClient("http://localhost:8080/springDemo/formInterFace", paramMap);
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 }

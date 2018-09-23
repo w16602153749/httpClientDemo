@@ -29,5 +29,15 @@ public class User implements Serializable{
 		this.passWord = passWord;
 	}
 	
+	public User(){
+		super();
+	}
+
+	public User(String userName, String passWord) {
+		super();
+		this.userName = userName;
+		this.passWord = passWord;
+	}
+	
 	
 }
