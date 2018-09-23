@@ -76,12 +76,20 @@ public class SpringDemo {
 	@ResponseBody
 	@RequestMapping(value = "fileInterface", method = RequestMethod.POST)
 	public String charactersearch(
-			@RequestParam(value = "springFile", required = true) MultipartFile file,String hash, String timestamp) {
-		System.out.println("hash: "+hash);
-		System.out.println("timestamp: "+timestamp);
-		System.out.println("file size: "+file.getSize()); 
-		System.out.println("file form name: "+file.getName()); 
-		System.out.println("file real name: "+file.getOriginalFilename()); 
+			@RequestParam(value = "springFile", required = true) MultipartFile[] file,String hash, String timestamp) {
+		System.out.println("begin upload file");
+		if(file.length==0){
+			System.out.println("no upload file");
+		}else{
+			System.out.println("file array length: "+file.length);
+			for(MultipartFile ff:file){
+				System.out.println("hash: "+hash);  
+				System.out.println("timestamp: "+timestamp);
+				System.out.println("file size: "+ff.getSize()); 
+				System.out.println("file form name: "+ff.getName()); 
+				System.out.println("file real name: "+ff.getOriginalFilename()); 
+			}
+		}
 		return "file upload success";
 	}
 	

@@ -159,23 +159,57 @@ public class OkHttpUtil {
     	        .build();
     	return execute(request); 
     }
-    
-    public static Response postFile(String url,String filePath) throws IOException{
+    /**
+     * okhttp post方式提交文件(每次上传一个文件)
+     * @param url	后台接受路径
+     * @param filePath	上传文件路径
+     * @param paramFile	上传文件后台接收参数名
+     * @param paramMap	上传文件后台其他参数map
+     * @return
+     * @throws IOException
+     */
+    public static Response postFile(String url,String filePath,String paramFile,Map<String,String> paramMap) throws IOException{
     	File file =new File(filePath);
     	if(file==null ||!file.exists()){
     		System.out.println("file not exist or file format is not correct");
     		return null;
     	} 
     	RequestBody fileBody = RequestBody.create(MEDIA_TYPE_FILE, file);
-		RequestBody requestBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("springFile", file.getName(), fileBody)
-                .addFormDataPart("hash", "hash111")
-                .addFormDataPart("timestamp", "timestamp111")
-                .build();
+    	MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+    	 for (String key: paramMap.keySet()) {
+             builder.addFormDataPart(key,paramMap.get(key));
+         }
+    	builder.addFormDataPart(paramFile, file.getName(), fileBody);
         Request request = new Request.Builder()
     	        .url(url)
-    	        .post(requestBody)
+    	        .post(builder.build())
+    	        .build();
+        return execute(request); 
+    }
+    
+    /**
+     * okhttp post方式提交文件(同时上传多个文件)
+     * @param url	后台接受路径
+     * @param filePathList	上传文件路径list
+     * @param paramFile	上传文件后台接收参数名
+     * @param paramMap	上传文件后台其他参数map
+     * @return
+     * @throws IOException
+     */
+    public static Response postFileList(String url,List<String> filePathList,String paramFile,Map<String,String> paramMap) throws IOException{
+    	MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+    	 for (String key: paramMap.keySet()) {
+             builder.addFormDataPart(key,paramMap.get(key));
+         }
+    	 for(String pathList:filePathList){
+    		 File file = new File(pathList);
+    		 builder.addFormDataPart(paramFile, file.getName(), RequestBody.create(MEDIA_TYPE_FILE, file));
+     	 }
+        Request request = new Request.Builder()
+    	        .url(url)
+    	        .post(builder.build())
     	        .build();
         return execute(request); 
     }

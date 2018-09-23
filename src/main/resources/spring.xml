@@ -65,7 +65,18 @@
     </property>
   </bean>
   
-  <!-- spring文件解析器 -->
-  <bean id="multipartResolver"
-		class="org.springframework.web.multipart.commons.CommonsMultipartResolver" />
+   <!-- SpringMVC上传文件时，需要配置MultipartResolver处理器-->
+  <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
+        <!-- 默认编码 -->
+        <property name="defaultEncoding" value="utf-8" />  
+        <!-- 设定文件大小最大值为10MB，10*1024*1024 -->
+        <property name="maxUploadSize" value="1048576" />  
+        <!-- 设定文件上传时写入内存的最大值，如果小于这个参数不会生成临时文件，默认为10240 -->
+        <property name="maxInMemorySize" value="40960" />  
+         <!-- 上传文件的临时路径 -->
+	    <property name="uploadTempDir" value="fileUpload/temp"></property>
+	    <!-- 延迟文件解析 -->
+	    <property name="resolveLazily" value="true"/>
+    </bean> 
+
 </beans>
